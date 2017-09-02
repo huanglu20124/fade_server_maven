@@ -24,8 +24,18 @@ public class Note implements Serializable{
 	private Integer good_num;
 	
 	private Integer isRelay;
+	
+	private String post_area;
 
 	
+
+	public String getPost_area() {
+		return post_area;
+	}
+
+	public void setPost_area(String post_area) {
+		this.post_area = post_area;
+	}
 
 	public Integer getNote_id() {
 		return note_id;

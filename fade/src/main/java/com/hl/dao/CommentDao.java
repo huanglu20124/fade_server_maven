@@ -17,10 +17,11 @@ public interface CommentDao {
 
 	Integer isHaveCommentGood(Integer comment_id, Integer user_id);
 
-	int addCommentGood(Integer comment_id, Integer user_id);
+	int addCommentGood(Integer comment_id, Integer user_id,Integer note_id);
 
 	int updateCommentGoodNum(Integer comment_id);
 
-	List<Map<String, Object>> getThreeComment(Integer note_id);
+	List<Comment> getThreeComment(Integer note_id);
+
 
 }

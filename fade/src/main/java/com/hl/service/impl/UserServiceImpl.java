@@ -1,6 +1,5 @@
 package com.hl.service.impl;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -10,8 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
-
-//import org.hibernate.id.IncrementGenerator;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.runner.RunWith;
@@ -117,7 +114,7 @@ public class UserServiceImpl implements UserService {
 			if(save_ans == 0){
 				jsonObject.put(Const.ERR, "保存头像失败，账号不存在"); //保存头像失败
 			}else{
-				jsonObject.put(Const.IMAGE_URL, head_image_url);
+				jsonObject.put(Const.HEAD_IMAGE_URL, head_image_url);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -156,7 +153,7 @@ public class UserServiceImpl implements UserService {
 				jsonObject.put(Const.ERR, "获取头像失败，账号可能不存在");
 			}else{
 				if(user.getHead_image_url() != null && !(user.getHead_image_url().equals(""))){
-					jsonObject.put("image_url", user.getHead_image_url());
+					jsonObject.put(Const.HEAD_IMAGE_URL, user.getHead_image_url());
 				}
 			}
 		} catch (JSONException e) {
@@ -242,7 +239,7 @@ public class UserServiceImpl implements UserService {
 	private void putUserAllJson(JSONObject jsonObject, User user){
 		try {
 			jsonObject.put(Const.NICKNAME, user.getNickname());
-			jsonObject.put(Const.IMAGE_URL, user.getHead_image_url());
+			jsonObject.put(Const.HEAD_IMAGE_URL, user.getHead_image_url());
 			jsonObject.put(Const.FADE_NAME, user.getFade_name());
 			jsonObject.put(Const.TELEPHONE, user.getTelephone());
 			jsonObject.put(Const.SEX, user.getSex());
@@ -256,6 +253,7 @@ public class UserServiceImpl implements UserService {
 			jsonObject.put(Const.FANS_NUM, user.getFans_num());
 			jsonObject.put(Const.AREA, user.getAera());
 			jsonObject.put(Const.WALLPAPER_URL, user.getWallpapaer_url());
+			jsonObject.put(Const.REGISTER_TIME, user.getRegister_time());
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

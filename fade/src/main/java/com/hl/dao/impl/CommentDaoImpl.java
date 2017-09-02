@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,9 +21,14 @@ import com.hl.util.Const;
 
 public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 	/**
-	 * 
+	 * commentDao缓存方法记录
+	 * (value="findTenCommentByGood",key="'c1_'+#note_id", unless="#result == null")
+	 * (value="findOriginComment",key="'c2_'+#to_comment_id", unless="#result == null")
+	 * (value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
+	 * (value="getThreeComment",key="'c4_'+#note_id", unless="#result == null")
 	 */
 
+	@Cacheable(value="findTenCommentByGood",key="'c1_'+#note_id", unless="#result == null")
 	@Override
 	public List<Comment> findTenCommentByGood(Integer note_id) {
 		//打开详情页时，一次获取10条热门评论列表，按照点赞量
@@ -30,28 +36,35 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		return this.getJdbcTemplate().query(sql,new CommentRowMapper(),note_id);
 	}
 
+	@CacheEvict(value="findTwentyCommentByTime",key="'c3_'+#comment.getNote_id()+'_0'")
 	@Override
 	public Integer addComment(final Comment comment) {
-		final String sql = "insert into comment values(null,?,?,?,?,?,?,?,?,?,0)";
+		final String sql = "insert into comment values(null,?,?,?,?,?,?,?,0)";
 		//返回主键
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-		//返回主键
-		getJdbcTemplate().update(new PreparedStatementCreator() {
-			@Override
-			public java.sql.PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				java.sql.PreparedStatement psm =  connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-				psm =  connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-				psm.setInt(1, comment.getUser_id()); psm.setString(2,comment.getNickname());  
-				psm.setString(3, comment.getHead_image_url()); psm.setInt(4, comment.getTo_comment_id());  
-				psm.setInt(5, comment.getTo_user_id()); psm.setString(6, comment.getTo_user_nickname());
-				psm.setInt(7, comment.getNote_id()); psm.setString(8, comment.getComment_time());
-				psm.setString(9, comment.getComment_content());
-				return psm;
-			}
-		},keyHolder);
+		try {
+			//返回主键
+			getJdbcTemplate().update(new PreparedStatementCreator() {
+				@Override
+				public java.sql.PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					java.sql.PreparedStatement psm =  connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+					psm =  connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+					psm.setInt(1, comment.getUser_id()); psm.setString(2,comment.getNickname());  
+					psm.setString(3, comment.getHead_image_url()); psm.setInt(4, comment.getTo_comment_id());  
+					psm.setInt(5, comment.getNote_id()); psm.setString(6, comment.getComment_time());
+					psm.setString(7, comment.getComment_content());
+					return psm;
+				}
+			},keyHolder);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
 		return keyHolder.getKey().intValue();
 	}
 
+	@Cacheable(value="findOriginComment",key="'c2_'+#to_comment_id", unless="#result == null")
 	@Override
 	public Map<String, Object> findOriginComment(Integer to_comment_id) {
 		//找到原评论内容
@@ -59,6 +72,7 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		return getJdbcTemplate().queryForMap(sql,to_comment_id);
 	}
 
+	@Cacheable(value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
 	@Override
 	public List<Comment> findTwentyCommentByTime(Integer note_id, Integer start) {
 		//打开详情页时，一次获取20条评论列表，按照时间顺序
@@ -80,13 +94,13 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 			String sql = "select comment_id from comment_good where comment_id=? and user_id=?";
 			return getJdbcTemplate().queryForObject(sql, Integer.class,comment_id,user_id);
 		} catch (Exception e) {
-			return 0;
+			return null;
 		}
-		
 	}
 
+	@CacheEvict(value="findTenCommentByGood",key="'c1_'+#note_id")
 	@Override
-	public int addCommentGood(Integer comment_id, Integer user_id) {
+	public int addCommentGood(Integer comment_id, Integer user_id,Integer note_id) {
 		String sql = "insert into comment_good values(null,?,?)";
 		return getJdbcTemplate().update(sql,comment_id,user_id);
 	}
@@ -98,17 +112,15 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		return getJdbcTemplate().update(sql,comment_id);	
 	}
 
+	@Cacheable(value="getThreeComment",key="'c4_'+#note_id", unless="#result == null")
 	@Override
-	public List<Map<String, Object>> getThreeComment(Integer note_id) {
-		//取三条非回复类型的评论
-		String sql = "select user_id,nickname,comment_content,to_comment_id,to_user_id,to_user_nickname "
-				+ "from comment where note_id=? order by comment_id desc LIMIT 3";
-		return getJdbcTemplate().queryForList(sql,note_id);
-		
-		
-
+	public List<Comment> getThreeComment(Integer note_id) {
+		//取三条热门的评论
+		String sql = "select * from comment where note_id=? order by comment_good_num desc LIMIT 3";
+		return getJdbcTemplate().query(sql, new CommentRowMapper(),note_id);
 	}
 
+	
 	class CommentRowMapper implements RowMapper<Comment>{
 		@Override
 		public Comment mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -118,8 +130,6 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 			comment.setNickname(rs.getString(Const.NICKNAME));
 			comment.setHead_image_url(rs.getString(Const.HEAD_IMAGE_URL));
 			comment.setTo_comment_id(rs.getInt(Const.TO_COMMENT_ID));
-			comment.setTo_user_id(rs.getInt(Const.TO_USER_ID));
-			comment.setTo_user_nickname(rs.getString(Const.TO_USER_NICKNAME));
 			comment.setNote_id(rs.getInt(Const.NOTE_ID));
 			comment.setComment_time(rs.getString(Const.COMMENT_TIME));
 			comment.setComment_content(rs.getString(Const.COMMENT_CONTENT));

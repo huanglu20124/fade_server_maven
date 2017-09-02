@@ -53,11 +53,11 @@ public class NoteServlet extends HttpServlet {
 			break;
 			
 		case "01": //首页小请求
-			ans_str = noteService.getSmallSectionHome(request.getParameter("bunch"));
+			ans_str = noteService.getSmallSectionHome(Integer.valueOf(request.getParameter(Const.USER_ID)),request.getParameter("bunch"));
 			break;
 			
 		case "05": //发现的推荐版块请求
-			ans_str = noteService.getSectionDiscoverRecommond(request,Integer.valueOf(request.getParameter(Const.START)),
+			ans_str = noteService.getSectionDiscoverRecommond(request,Integer.valueOf(request.getParameter(Const.USER_ID)),Integer.valueOf(request.getParameter(Const.START)),
 					request.getParameter(Const.HOT_ID));
 		   break;
 			
@@ -94,10 +94,6 @@ public class NoteServlet extends HttpServlet {
 					Integer.valueOf(request.getParameter(Const.ISRELAY)),0);	
 			break;
 			
-		case "02"://转发帖请求原贴的内容
-			ans_str = noteService.getOriginNote(Integer.valueOf(request.getParameter(Const.ISRELAY)));
-			break;
-		
 		case "08"://更新单个帖续一秒数量的请求
 			ans_str = noteService.getLatestGoodNum(Integer.valueOf(request.getParameter(Const.NOTE_ID)));
 			break;
@@ -119,8 +115,11 @@ public class NoteServlet extends HttpServlet {
 			ans_str = noteService.getTwentyGood(Integer.valueOf(request.getParameter(Const.NOTE_ID)),Integer.valueOf(request.getParameter(Const.START)));
 		   break;
 		
-		case "12"://详情页的转发列表中，点击一项跳转到对应的详情页，获取详情页信息的请求
-			ans_str = noteService.getRelayDetail(Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+		case "12"://详情页的转发列表中，点击一项跳转到对应的详情页，获取详情页信息的请求,即是获取一个完整帖子信息的请求
+			ans_str = noteService.getNoteDetail(Integer.valueOf(request.getParameter(Const.USER_ID)),Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+			
+		case "13"://删除帖子的请求
+			ans_str = noteService.deleteNote(Integer.valueOf(request.getParameter(Const.NOTE_ID)));
 		default:
 			break;
 		}

@@ -70,9 +70,11 @@ public class UpLoadServlet extends HttpServlet {
 		
 		
 		//本地测试用
-		String ip_here = "http://localhost:8080/fade";
-		String ip_yun = "https://sysufade.cn/fade";
-		
+//		String ip_here = "http://192.168.137.1:8080/fade";
+//		String ip_yun = "https://sysufade.cn/fade";
+		//去掉工程后缀
+		String ip_here = "http://192.168.137.1:8080";
+		String ip_yun = "https://sysufade.cn";		
 		
 		//解析request
 		try {
@@ -95,6 +97,7 @@ public class UpLoadServlet extends HttpServlet {
 					if(name.equals(Const.USER_ID)) user_id = Integer.valueOf(value);
 					if(name.equals(Const.NOTE_ID)) note_id = Integer.valueOf(value);
 					if(name.endsWith("image_size_list")) image_size_list_str = value;
+					System.out.println("收到文件类型");
 					
 				}else{
 					String imagePath = "";
@@ -108,14 +111,15 @@ public class UpLoadServlet extends HttpServlet {
 					
 					
 					if(imageType.equals("head")){
-						//到时候部署时换这个地址
-						imagePath = request.getSession().getServletContext().getRealPath("image/head");
-						//imagePath = "E:/apache-tomcat-9.0.0.M22/wtpwebapps/Image/head"; //存在Image工程里
+						//imagePath = request.getSession().getServletContext().getRealPath("image/head");//存储到工程里面
+						//imagePath = "E:/image/head";//本地存储到外部
+						imagePath = "/usr/java/image/head";//云端存储到外部
 						path2 = "/image/head/";
 						imageName = uuid.substring(30)+"_"+fileName;
 					}else{
-						imagePath = request.getSession().getServletContext().getRealPath("image/note");
-						//imagePath = "E:/apache-tomcat-9.0.0.M22/wtpwebapps/Image/note";
+						//imagePath = request.getSession().getServletContext().getRealPath("image/note");
+						//imagePath = "E:/image/note"; //本地存储到外部
+						imagePath = "/usr/java/image/note";//云端存储到外部
 						path2 = "/image/note/";
 						imageName = uuid.substring(30)+"_"+fileName;
 						note_image_list.add(ip_yun +path2+imageName);

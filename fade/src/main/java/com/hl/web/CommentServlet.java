@@ -52,7 +52,7 @@ public class CommentServlet extends HttpServlet {
 		String ans_str = null;
 		switch (request.getParameter("code")) {
 		case "00"://按照点赞数量  打开详情页时，获取10条热门评论列表
-			ans_str = commentService.getTenCommentByGood(Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+			ans_str = commentService.getTenCommentByGood(Integer.valueOf(request.getParameter(Const.USER_ID)),Integer.valueOf(request.getParameter(Const.NOTE_ID)));
 			break;
 
 		case "01"://发评论
@@ -70,7 +70,8 @@ public class CommentServlet extends HttpServlet {
 			break;
 		
 		case "02"://按照时间顺序   一次获取20条评论列表
-			Map<String, Object>temp = commentService.getTwentyCommentByTime(Integer.valueOf(request.getParameter(Const.NOTE_ID)),
+			Map<String, Object>temp = commentService.getTwentyCommentByTime(Integer.valueOf(request.getParameter(Const.USER_ID)),
+					Integer.valueOf(request.getParameter(Const.NOTE_ID)),
 					Integer.valueOf(request.getParameter(Const.START)));
 			ans_str = new Gson().toJson(temp);
 			break;

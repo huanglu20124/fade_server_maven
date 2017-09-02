@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>Fade</display-name>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:applicationContext.xml</param-value>
+  </context-param>
+  
+  <listener>
+    <listener-class>com.hl.timer.GetGoodNumListener</listener-class>
+  </listener>
+  
+  <servlet>
+    <servlet-name>note</servlet-name>
+    <servlet-class>com.hl.web.NoteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>note</servlet-name>
+    <url-pattern>/note</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>uploadImage</servlet-name>
+    <servlet-class>com.hl.web.UpLoadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>uploadImage</servlet-name>
+    <url-pattern>/uploadImage</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>comment</servlet-name>
+    <servlet-class>com.hl.web.CommentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>comment</servlet-name>
+    <url-pattern>/comment</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>user</servlet-name>
+    <servlet-class>com.hl.web.UserServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>user</servlet-name>
+    <url-pattern>/user</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

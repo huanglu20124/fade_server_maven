@@ -12,12 +12,11 @@
 
 	<!-- 1.将连接池 -->
 	<bean name="dataSource1" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-		<property name="jdbcUrl"
-			value="jdbc:mysql://119.23.229.19:3306/fade?useUnicode=true&amp;characterEncoding=utf-8"></property>
-		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-		<property name="user" value="student"></property>
-		<property name="password" value="137137lu"></property>
-		<property name="maxPoolSize" value="100"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://119.23.229.19:3306/fade?useUnicode=true&amp;characterEncoding=utf-8"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>
 	</bean>
 
 
@@ -66,6 +65,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:redis.properties</value>
+				<value>classpath:mysql.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -85,7 +85,7 @@
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 		<property name="hostName" value="${redis.hostname}" />
 		<property name="port" value="${redis.port}" />
-		<property name="password" value="137137lu" />
+		<property name="password" value="${redis.pass}" />
 		<property name="database" value="${redis.dbIndex}" />
 		<property name="timeout" value="${redis.timeout}"></property>
 		<property name="usePool" value="${redis.usePool}"></property>

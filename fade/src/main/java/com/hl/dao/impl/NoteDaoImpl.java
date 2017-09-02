@@ -108,7 +108,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 
 	@Override
 	public Integer addNote(final Note note) {
-		final String sql = "insert into note values(null,?,?,?,?,?,0,0,0,0,0,?)";
+		final String sql = "insert into note values(null,?,?,?,?,?,0,0,0,0,0,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		//返回主键
 		getJdbcTemplate().update(new PreparedStatementCreator() {
@@ -119,6 +119,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 				psm.setInt(1, note.getUser_id()); psm.setString(2, note.getNickname());  
 				psm.setString(3, note.getHead_image_url()); psm.setString(4, note.getNote_content());  
 				psm.setString(5, note.getPost_time()); psm.setInt(6, note.getIsRelay());
+				psm.setString(7, note.getPost_area());
 				return psm;
 			}
 		},keyHolder);
@@ -299,6 +300,13 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 		return getJdbcTemplate().queryForMap(sql,note_id);
 	}
 	
+	@Override
+	public int deleteNote(Integer note_id) {
+		//删除帖子
+		String sql = "delete from note where note_id=?";
+		return getJdbcTemplate().update(sql,note_id);
+	}
+	
 	class noteRowMapper implements RowMapper<Note>{
 		@Override
 		public Note mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -315,6 +323,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 			note.setGood_num(rs.getInt(Const.GOOD_NUM));
 			note.setRelay_num(rs.getInt(Const.RELAY_NUM));
 			note.setIsRelay(rs.getInt(Const.ISRELAY));
+			note.setPost_area(rs.getString(Const.POST_AREA));
 			return note;
 		}
 		

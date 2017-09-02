@@ -11,7 +11,7 @@ public interface NoteService {
 
 	String getBigSectionHome(Integer user_id, Integer start );
 
-	String getSmallSectionHome(String bunch);
+	String getSmallSectionHome(Integer user_id,String bunch);
 
 	String addOriginNote(Note note, String parameter);
 
@@ -19,11 +19,9 @@ public interface NoteService {
 	
 	String addSecond(Integer user_id,Integer note_id, Integer isRelay,int type);
 
-	String getSectionDiscoverRecommond(HttpServletRequest request, Integer start,String hot_id);
+	String getSectionDiscoverRecommond(HttpServletRequest request, Integer user_id,Integer start,String hot_id);
 	
 	public String saveNoteImageUrl(List<String> note_image_list,String[]image_size_list, Integer note_id);
-
-	String getOriginNote(Integer note_id);
 
 	String getLatestGoodNum(Integer note_id);
 
@@ -35,12 +33,13 @@ public interface NoteService {
 
 	String getTwentyGood(Integer note_id, Integer start);
 
-	String getRelayDetail(Integer note_id);
+	String getNoteDetail(Integer user_id,Integer note_id);
 	
 	public  List<Note> updateNoteDieForMap(List<Map<String, Object>> note_list, int type);
 	
 	public  List<Note> updateNoteDieForNote(List<Note> note_list, int type);
 	
-	void test1();
+	public String deleteNote(Integer note_id);
+	
 
 }

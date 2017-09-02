@@ -32,7 +32,8 @@ public class Const {
 	public static final String RELAY_NUM       = "relay_num";
 	public static final String GOOD_NUM        = "good_num";
 	public static final String ISRELAY         = "isRelay";
-
+	public static final String POST_AREA	   = "post_area";
+	public static final String ISGOOD          = "isGood";
 	//判断帖子的
 	public static final int FANS     = 0; 
 	public static final int STRANGER = 1;
@@ -85,8 +86,7 @@ public class Const {
 	public static final String COMMENT_GOOD_NUM   ="comment_good_num";
 	public static final String START_NUM          ="start_num";
 	public static final String ORIGIN_COMMENT     ="origin_comment";
-	public static final String TO_USER_ID         ="to_user_id";
-	public static final String TO_USER_NICKNAME   ="to_user_nickname";
+	public static final String COMMENT_ISGOOD     = "comment_isGood";
 	
 	//评论点赞表
 	public static final String COMMENT_GOOD_ID    ="comment_good_id";

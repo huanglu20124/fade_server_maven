@@ -12,27 +12,13 @@ public class Comment implements Serializable{
 	private Integer user_id;             
 	private String  nickname;            
 	private String  head_image_url;      
-	private Integer to_comment_id;        
-	private Integer to_user_id;         
-	private String to_user_nickname;   
+	private Integer to_comment_id;          
 	 
 	private Integer note_id;          
 	private String comment_time;      
 	private String comment_content;     
 	private Integer comment_good_num;  
 	
-	public Integer getTo_user_id() {
-		return to_user_id;
-	}
-	public void setTo_user_id(Integer to_user_id) {
-		this.to_user_id = to_user_id;
-	}
-	public String getTo_user_nickname() {
-		return to_user_nickname;
-	}
-	public void setTo_user_nickname(String to_user_nickname) {
-		this.to_user_nickname = to_user_nickname;
-	}
 
 	public Integer getComment_id() {
 		return comment_id;

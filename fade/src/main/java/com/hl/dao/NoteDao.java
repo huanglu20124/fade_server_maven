@@ -28,4 +28,5 @@ public interface NoteDao {
 	public int[] addNoteTagBatch(Integer note_id, String tag_list);
 	public int[] saveImageBatch(Integer note_id, List<String> note_image_list,String[]image_size_list);
 	public Map<String,Object> findNoteForAddSecond(Integer note_id);
+	public int deleteNote(Integer note_id);
 }
