@@ -29,4 +29,9 @@ public interface NoteDao {
 	public int[] saveImageBatch(Integer note_id, List<String> note_image_list,String[]image_size_list);
 	public Map<String,Object> findNoteForAddSecond(Integer note_id);
 	public int deleteNote(Integer note_id);
+	public List<Note> findLatestNoteStar(Integer user_id, Integer last_one);
+	public List<Note> findLatestNoteMe(Integer user_id, Integer last_one);
+	public int updateNoteHead(String head_image_url,Integer user_id);
+	public int updateNoteGoodHead(String head_image_url,Integer user_id);
+	public List<Integer> findAllMyNoteId(Integer user_id);
 }

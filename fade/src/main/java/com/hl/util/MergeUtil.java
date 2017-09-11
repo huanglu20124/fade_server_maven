@@ -26,4 +26,24 @@ public class MergeUtil {
 		}
 		return ans_list;
 	}
+
+	public static List<Note> mergeByIdForNote(List<Note> latest_notes_star, List<Note> latest_notes_me) {
+		//归并排序
+		List<Note>ans_list = new ArrayList<>();
+		int i = 0, j = 0, k = 0;
+		while(i < latest_notes_star.size() && j < latest_notes_me.size()){
+			if(latest_notes_star.get(i).getNote_id() <= latest_notes_me.get(j).getNote_id()){
+				ans_list.add(k++, latest_notes_star.get(i++));
+			}else {
+				ans_list.add(k++, latest_notes_me.get(j++));
+			}
+		}
+		while(i < latest_notes_star.size()){
+			ans_list.add(k++, latest_notes_star.get(i++));
+		}
+		while(j < latest_notes_me.size()){
+			ans_list.add(k++, latest_notes_me.get(j++));
+		}
+		return ans_list;
+	}
 }

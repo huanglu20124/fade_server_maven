@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.hl.dao.CommentDao;
 import com.hl.dao.NoteDao;
+import com.hl.dao.RedisDao;
 import com.hl.domain.Comment;
 import com.hl.service.CommentService;
 import com.hl.util.Const;
@@ -36,7 +37,8 @@ public class CommentServiceImpl implements CommentService {
 	private CommentDao commentDao;
 	@Resource(name = "noteDao")
 	private NoteDao noteDao;
-	
+	@Resource(name = "redisDao")
+	private RedisDao redisDao;
 	@Override
 	public String getTenCommentByGood(Integer user_id,Integer note_id) {
 		//打开详情页时，获取10条热门评论列表
@@ -134,7 +136,25 @@ public class CommentServiceImpl implements CommentService {
 			}
 			return ConvertUtil.convertComment2ListMap(list,origin_comment_map,comment_isGood_list);
 		}
+	}
+
+	
+	@Override
+	public String deleteComment(Integer note_id,Integer comment_id,Integer start) {
+		Map<String, Object>map = new HashMap<>();
+		//删除评论
+		if(commentDao.deleteComment(comment_id) == 1){
+			//删除原贴所有评论缓存
+			redisDao.deleteCacheKey("c1_"+note_id);
+			redisDao.deleteCacheKey("c2_"+comment_id);
+			redisDao.deleteCacheKey("c4_"+note_id);
+			redisDao.deleteCacheKey("c3_"+note_id+"_"+start);
+		}else{
+			map.put(Const.ERR, "删除失败，原评论不存在");
+		}
+		return null;
 	}	
 
+	
 	
 }

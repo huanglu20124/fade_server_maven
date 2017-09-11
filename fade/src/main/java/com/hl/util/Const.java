@@ -21,6 +21,7 @@ public class Const {
 	public static final String REGISTER_TIME= "register_time";
 	public static final String SUMMARY      = "summary";
 	public static final String HEAD_IMAGE_URL  = "head_image_url";
+	public static final String SCHOOL       = "school";
 	
 	//Note字段常量（有与user部分重叠的）
 	public static final String NOTE_ID         = "note_id";
@@ -61,6 +62,9 @@ public class Const {
 	public static final String IMAGE_LIST   = "image_list";
 	public static final String TAG_LIST     = "tag_list";
 	public static final String COMMENT_LIST = "comment_list";
+	
+	//续一秒更新数组
+	public static final String GOOD_NUM_LIST = "good_num_list";
 	
 	//大请求的id_list
 	public static final String ID_LIST      = "id_list";

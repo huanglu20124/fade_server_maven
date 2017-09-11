@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.log4j.net.SyslogAppender;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.hl.domain.Note;
 import com.hl.service.NoteService;
@@ -20,7 +22,7 @@ import com.hl.util.Const;
  * Servlet implementation class NoteServlet
  */
 public class NoteServlet extends HttpServlet {
-       
+     
     /**
 	 * 
 	 */
@@ -42,10 +44,10 @@ public class NoteServlet extends HttpServlet {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
-		
 		String ans_str = "";
 		//NoteService noteService = BasicFactory.getFactory().getInstance(NoteService.class);
-		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+		//ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+		ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
 		NoteService noteService = (NoteService) applicationContext.getBean("noteService");
 		switch (request.getParameter("code")) {
 		case "00": //首页大请求
@@ -117,9 +119,16 @@ public class NoteServlet extends HttpServlet {
 		
 		case "12"://详情页的转发列表中，点击一项跳转到对应的详情页，获取详情页信息的请求,即是获取一个完整帖子信息的请求
 			ans_str = noteService.getNoteDetail(Integer.valueOf(request.getParameter(Const.USER_ID)),Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+			break;
 			
 		case "13"://删除帖子的请求
 			ans_str = noteService.deleteNote(Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+			break;
+		
+		case "14"://顶部下拉刷新请求
+			ans_str = noteService.topReload(Integer.valueOf(request.getParameter(Const.USER_ID)),
+					request.getParameter("bunch"));
+			break;
 		default:
 			break;
 		}

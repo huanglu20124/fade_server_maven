@@ -16,12 +16,12 @@ public class GetGoodNumTimer {
 	public void startTimer(){
 		timer = new Timer();
 		GregorianCalendar gc = new GregorianCalendar();
-		//系统启动一分钟后开始执行任务
+		//系统启动10秒后开始执行任务
 		gc.setTime(new Date());
 		gc.add(Calendar.SECOND, 10);
 		
-		//每10分钟执行一次
-		timer.schedule(new GetGoodNumTask(servletContext), gc.getTime(),600000);
+		//每5分钟执行一次
+		timer.schedule(new GetGoodNumTask(servletContext), gc.getTime(),30000);
 	}
 	
 	public void stopTimer(){

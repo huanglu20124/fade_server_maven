@@ -12,7 +12,6 @@
   <listener>
     <listener-class>com.hl.timer.GetGoodNumListener</listener-class>
   </listener>
-  
   <servlet>
     <servlet-name>note</servlet-name>
     <servlet-class>com.hl.web.NoteServlet</servlet-class>

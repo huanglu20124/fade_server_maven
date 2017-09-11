@@ -1,5 +1,7 @@
 package com.hl.service.impl;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +36,7 @@ import com.hl.util.Const;
 import com.hl.util.ConvertUtil;
 import com.hl.util.MergeUtil;
 import com.hl.util.TimeUtil;
+import com.mchange.v2.async.StrandedTaskReporting;
 import com.mysql.jdbc.Field;
 
 @Service("noteService")
@@ -129,7 +132,7 @@ public class NoteServiceImpl implements NoteService {
 						dealWithRelay(relay_list_map, note);
 					}
 					// 3号新增,热评数组
-					comment_list.add(commentService.getThreeCommentForNote(user_id,note_id));
+					comment_list.add(commentService.getThreeCommentForNote(user_id, note_id));
 					if (noteDao.isHaveGood(user_id, note_id) != null) {
 						isGood_List.add(1);
 					} else {
@@ -158,7 +161,7 @@ public class NoteServiceImpl implements NoteService {
 			System.out.println("next的id" + (int) note_list_merge.get(next).get(Const.NOTE_ID));
 
 			allocNote(user_id, note_list_merge, result_list, id_list, next);
-			if(result_list.size() == 0){
+			if (result_list.size() == 0) {
 				map.put(Const.ERR, "0");
 			}
 			// 对于要发送内容的，先计算过滤一遍过期的，并且加上帖子数组和和图片数组
@@ -191,10 +194,10 @@ public class NoteServiceImpl implements NoteService {
 					// 8月22更新，引入批量操作
 					delete_list.add(note_id);
 				} else {
-					//先要验证帖子是不是存在
+					// 先要验证帖子是不是存在
 					Note note_temp = noteDao.findNoteById(note_id, Const.ALL);
-					if(note_temp != null)
-					     list_ans.add(note_temp);
+					if (note_temp != null)
+						list_ans.add(note_temp);
 				}
 			}
 			if (delete_list.size() > 0)
@@ -221,10 +224,10 @@ public class NoteServiceImpl implements NoteService {
 					// 更新redis
 					redisDao.deleteNote(note_id);
 				} else {
-					//先要验证帖子是不是存在
+					// 先要验证帖子是不是存在
 					Note note_temp = noteDao.findNoteById(note_id, Const.ALL);
-					if(note_temp != null)
-					     list_ans.add(note_temp);
+					if (note_temp != null)
+						list_ans.add(note_temp);
 				}
 			}
 			if (delete_list.size() > 0)
@@ -261,10 +264,10 @@ public class NoteServiceImpl implements NoteService {
 					// 删除对应缓存
 					redisDao.deleteCacheKey("2_" + Const.FANS + note_id);
 				} else {
-					//先要验证帖子是不是存在
+					// 先要验证帖子是不是存在
 					Note note_temp = noteDao.findNoteById(note_id, Const.ALL);
-					if(note_temp != null)
-					     list_ans.add(note_temp);
+					if (note_temp != null)
+						list_ans.add(note_temp);
 				}
 			}
 			if (delete_list.size() > 0)
@@ -293,10 +296,10 @@ public class NoteServiceImpl implements NoteService {
 					// 删除对应缓存
 					redisDao.deleteCacheKey("2_" + Const.STRANGER + note_id);
 				} else {
-					//先要验证帖子是不是存在
+					// 先要验证帖子是不是存在
 					Note note_temp = noteDao.findNoteById(note_id, Const.ALL);
-					if(note_temp != null)
-					     list_ans.add(note_temp);
+					if (note_temp != null)
+						list_ans.add(note_temp);
 				}
 			}
 			if (delete_list.size() > 0)
@@ -336,7 +339,7 @@ public class NoteServiceImpl implements NoteService {
 					// 活着的话则添加图片数组，标签数组
 					List<Map<String, Object>> image_list = noteDao.findAllImage(note_id);
 					List<Map<String, Object>> tag_list = noteDao.findAllTag(note_id);
-					List<Map<String, Object>> comment_list = commentService.getThreeCommentForNote(user_id,note_id);
+					List<Map<String, Object>> comment_list = commentService.getThreeCommentForNote(user_id, note_id);
 					Integer isGood = 0;
 					if (noteDao.isHaveGood(user_id, note_id) != null) {
 						isGood = 1;
@@ -354,7 +357,7 @@ public class NoteServiceImpl implements NoteService {
 				id_list.add(note_id);
 				count++;
 			}
-			//这样的话，前面过滤掉了一部分挂掉的,一直找活的，凑到20个为止。
+			// 这样的话，前面过滤掉了一部分挂掉的,一直找活的，凑到20个为止。
 			if (count == 100) {
 				break;
 			}
@@ -395,7 +398,7 @@ public class NoteServiceImpl implements NoteService {
 					dealWithRelay(relay_list_map, note);
 				}
 				// 3号新增,热评数组
-				comment_list.add(commentService.getThreeCommentForNote(user_id,note.getNote_id()));
+				comment_list.add(commentService.getThreeCommentForNote(user_id, note.getNote_id()));
 				// 添加是否点赞
 				if (noteDao.isHaveGood(user_id, note_id) != null) {
 					isGood_list.add(1);
@@ -417,6 +420,7 @@ public class NoteServiceImpl implements NoteService {
 		Map<String, Object> map = new HashMap<>();
 		// 增加创建时间
 		note.setPost_time(TimeUtil.getCurrentTime());
+		System.out.println(note.getNote_content());
 		// 添加原创贴
 		// 1. 将帖子加到数据库 redis更新
 		Integer note_id = noteDao.addNote(note);
@@ -476,6 +480,12 @@ public class NoteServiceImpl implements NoteService {
 				noteDao.addGoodUser(note_id, user);
 				// 2.1.删除点赞表头20条的缓存
 				redisDao.deleteCacheKey("6_" + note_id + "_0");
+				// 4. 删除被点赞帖的缓存，以及点赞数量缓存
+				redisDao.deleteCacheKey("0_" + note_id);
+				redisDao.deleteCacheKey("1_" + note_id);
+				redisDao.deleteCacheKey("2_" + note_id);
+				redisDao.deleteCacheKey("7_" + note_id);
+				redisDao.deleteCacheKey("9_" + note_id);
 				latest_num = noteDao.getLatestGoodNum(note_id);
 				map.put(Const.GOOD_NUM, latest_num);
 				// 3.只有在帖子是原创贴的情况下，才能加入到排行榜
@@ -483,15 +493,15 @@ public class NoteServiceImpl implements NoteService {
 					// 更新redis排名
 					redisDao.updateAddNoteRank(note_id, latest_num);
 				}
-				// 4. 删除被点赞帖的缓存，以及点赞数量缓存
-				redisDao.deleteCacheKey("0_" + note_id);
-				redisDao.deleteCacheKey("1_" + note_id);
-				redisDao.deleteCacheKey("2_" + note_id);
-				redisDao.deleteCacheKey("7_" + note_id);
-				redisDao.deleteCacheKey("9_" + note_id);
 				// 5.如果是转发帖，则原贴也续一秒
 				if (isRelay != 0) {
 					noteDao.addSecond(isRelay);
+					// 6.删除原贴的缓存
+					redisDao.deleteCacheKey("0_" + isRelay);
+					redisDao.deleteCacheKey("1_" + isRelay);
+					redisDao.deleteCacheKey("2_" + isRelay);
+					redisDao.deleteCacheKey("7_" + isRelay);
+					redisDao.deleteCacheKey("9_" + isRelay);
 					Map<String, Object> map_origin = noteDao.findNoteForAddSecond(isRelay);
 					Integer more_isRelay = (Integer) map_origin.get(Const.ISRELAY);
 					if (more_isRelay == 0) {
@@ -500,30 +510,24 @@ public class NoteServiceImpl implements NoteService {
 						// 更新redis排名
 						redisDao.updateAddNoteRank(isRelay, latest_num_origin);
 					}
-					// 6.删除原贴的缓存
-					redisDao.deleteCacheKey("0_" + isRelay);
-					redisDao.deleteCacheKey("1_" + isRelay);
-					redisDao.deleteCacheKey("2_" + isRelay);
-					redisDao.deleteCacheKey("7_" + isRelay);
-					redisDao.deleteCacheKey("9_" + isRelay);
 				}
 			}
 
 		} else {
 			// 间接续秒
 			if (noteDao.addSecond(note_id) == 1) {
-				latest_num = noteDao.getLatestGoodNum(note_id);
-				// 只有在帖子是原创贴的情况下，才能加入或者更新到排行榜
-				if (noteDao.findIsRelay(note_id) == 0) {
-					// 更新redis排名
-					redisDao.updateAddNoteRank(note_id, latest_num);
-				}
 				// 6.删除原贴的缓存
 				redisDao.deleteCacheKey("0_" + note_id);
 				redisDao.deleteCacheKey("1_" + note_id);
 				redisDao.deleteCacheKey("2_" + note_id);
 				redisDao.deleteCacheKey("7_" + note_id);
 				redisDao.deleteCacheKey("9_" + note_id);
+				latest_num = noteDao.getLatestGoodNum(note_id);
+				// 只有在帖子是原创贴的情况下，才能加入或者更新到排行榜
+				if (noteDao.findIsRelay(note_id) == 0) {
+					// 更新redis排名
+					redisDao.updateAddNoteRank(note_id, latest_num);
+				}
 			}
 		}
 		return gson.toJson(map);
@@ -546,62 +550,74 @@ public class NoteServiceImpl implements NoteService {
 			map.put(Const.HOT_ID, hot_note.get(Const.HOT_ID));
 			All_note_id = (List<Object>) hot_note.get(Const.HOT_NOTE);
 		} else {
-			// 非首次加载，从后往前，查看有没有对应的排序表
-			for (int i = 2; i >= 0; i--) {
+			Boolean isFind = false;
+			int hot_note_array_size = hot_note_array.size();
+			// 非首次加载，后往前，查看有没有对应的排序表
+			for (int i = hot_note_array_size -1; i >= 0; i--) {
+
 				Map<String, Object> hot_note = hot_note_array.get(i);
 				String hot_id_temp = (String) hot_note.get(Const.HOT_ID);
 				if (hot_id.equals(hot_id_temp)) {
 					// 找到对应时刻的，
 					All_note_id = (List<Object>) hot_note.get(Const.HOT_NOTE);
+					isFind = true;
 					break;
-				} else if (i == 0) {
-					// 如果最终还没找到的话，则使用当前时刻的
-					All_note_id = (List<Object>) hot_note.get(Const.HOT_NOTE);
-				}
+				} 
+			}
+			if(isFind == false){
+				//没找到的话，使用最新排序表(最后一个)
+				All_note_id = (List<Object>) hot_note_array.get(hot_note_array_size-1).get(Const.HOT_NOTE);
 			}
 		}
-
+		Boolean isEmpty = false;
 		List<Object> list_note_id = null;
 		if (start * 20 + 19 <= All_note_id.size() - 1) {
 			list_note_id = All_note_id.subList(start.intValue() * 20, start.intValue() * 20 + 20);
-		} else {
+		} 
+		else if(start*20 <= All_note_id.size()-1){
 			list_note_id = All_note_id.subList(start.intValue() * 20, All_note_id.size());
 		}
-		// 再发送内容
-		List<Note> list = new ArrayList<>();
-		for (Object note_id : list_note_id) {
-			Note note_temp;
-			if ((note_temp = noteDao.findNoteById(new Integer(note_id.toString()), Const.STRANGER)) != null)
-				list.add(note_temp);
-		}
-
-		List<Note> update_list = updateNoteDieForNote(list, Const.STRANGER);
-		if (update_list.size() == 0) {
+		else {
+			isEmpty = true;
 			map.put(Const.ERR, "0");
-		} else {
-			// 添加标签表和图片表
-			List<List<Map<String, Object>>> image_list = new ArrayList<>();
-			List<List<Map<String, Object>>> tag_list = new ArrayList<>();
-			List<List<Map<String, Object>>> comment_list = new ArrayList<>();
-			List<Integer> isGood_list = new ArrayList<>();
-			// Map<String,Object>relay_list_map = new HashMap<>();
-			for (Note note : update_list) {
-				Integer note_id = note.getNote_id();
-				image_list.add(noteDao.findAllImage(note_id));
-				tag_list.add(noteDao.findAllTag(note_id));
-				// 3号新增,热评数组
-				comment_list.add(commentService.getThreeCommentForNote(user_id,note_id));
-
-				if (noteDao.isHaveGood(user_id, note_id) != null) {
-					isGood_list.add(1);
-				} else {
-					isGood_list.add(0);
-				}
-			}
-			map.put(Const.RESULT, ConvertUtil.convertNote2ListMap(update_list, image_list, tag_list, comment_list, null,
-					isGood_list));
 		}
+		
+		if(isEmpty == false){
+			// 再发送内容
+			List<Note> list = new ArrayList<>();
+			for (Object note_id : list_note_id) {
+				Note note_temp;
+				if ((note_temp = noteDao.findNoteById(new Integer(note_id.toString()), Const.STRANGER)) != null)
+					list.add(note_temp);
+			}
 
+			List<Note> update_list = updateNoteDieForNote(list, Const.STRANGER);
+			if (update_list.size() == 0) {
+				map.put(Const.ERR, "0");
+			} else {
+				// 添加标签表和图片表
+				List<List<Map<String, Object>>> image_list = new ArrayList<>();
+				List<List<Map<String, Object>>> tag_list = new ArrayList<>();
+				List<List<Map<String, Object>>> comment_list = new ArrayList<>();
+				List<Integer> isGood_list = new ArrayList<>();
+				// Map<String,Object>relay_list_map = new HashMap<>();
+				for (Note note : update_list) {
+					Integer note_id = note.getNote_id();
+					image_list.add(noteDao.findAllImage(note_id));
+					tag_list.add(noteDao.findAllTag(note_id));
+					// 3号新增,热评数组
+					comment_list.add(commentService.getThreeCommentForNote(user_id, note_id));
+
+					if (noteDao.isHaveGood(user_id, note_id) != null) {
+						isGood_list.add(1);
+					} else {
+						isGood_list.add(0);
+					}
+				}
+				map.put(Const.RESULT, ConvertUtil.convertNote2ListMap(update_list, image_list, tag_list, comment_list, null,
+						isGood_list));
+			}
+		}
 		return gson.toJson(map);
 	}
 
@@ -611,12 +627,16 @@ public class NoteServiceImpl implements NoteService {
 		Map<String, Object> map = new HashMap<>();
 		// 更新帖子图片表
 		try {
-			noteDao.saveImageBatch(note_id, note_image_list, image_size_list);
-			List<String> url_list = new ArrayList<>();
-			for (int i = 0; i < note_image_list.size(); i++) {
-				url_list.add(note_image_list.get(i));
+			if(note_image_list.size() == 0){
+				map.put(Const.ERR, "上传图片失败，请检查你的网络");
+			}else{
+				noteDao.saveImageBatch(note_id, note_image_list, image_size_list);
+				List<String> url_list = new ArrayList<>();
+				for (int i = 0; i < note_image_list.size(); i++) {
+					url_list.add(note_image_list.get(i));
+				}
+				map.put(Const.IMAGE_LIST, url_list);
 			}
-			map.put(Const.IMAGE_LIST, url_list);
 		} catch (Exception e) {
 			e.printStackTrace();
 			map.put(Const.ERR, "保存图片失败，原贴不存在");
@@ -624,7 +644,6 @@ public class NoteServiceImpl implements NoteService {
 		String ans_str = gson.toJson(map);
 		return ans_str;
 	}
-
 
 	@Override
 	public String getLatestGoodNum(Integer note_id) {
@@ -695,7 +714,7 @@ public class NoteServiceImpl implements NoteService {
 			// 先添加图片数组，标签数组
 			List<Map<String, Object>> image_list = noteDao.findAllImage(note_id);
 			List<Map<String, Object>> tag_list = noteDao.findAllTag(note_id);
-			List<Map<String, Object>> comment_list = commentService.getThreeCommentForNote(user_id,note_id);
+			List<Map<String, Object>> comment_list = commentService.getThreeCommentForNote(user_id, note_id);
 			Map<Integer, Object> relay_map = new HashMap<>();
 			Integer isGood = 0;
 			if (noteDao.isHaveGood(user_id, note_id) != null) {
@@ -713,37 +732,85 @@ public class NoteServiceImpl implements NoteService {
 
 	@Override
 	public String deleteNote(Integer note_id) {
-		//删除帖子
-		Map<String, Object>map = new HashMap<>();
-		//先保存从note_image表拿到的数据
-		List<Map<String, Object>>all_images = noteDao.findAllImage(note_id);
-		//删除数据库的数据
-		if(noteDao.deleteNote(note_id) == 1){
-			//删除数据库成功
-			//删除redis排行榜的记录
+		// 删除帖子
+		Map<String, Object> map = new HashMap<>();
+		// 先保存从note_image表拿到的数据
+		List<Map<String, Object>> all_images = noteDao.findAllImage(note_id);
+		// 删除数据库的数据
+		if (noteDao.deleteNote(note_id) == 1) {
+			// 删除数据库成功
+			// 删除redis排行榜的记录
 			redisDao.deleteNote(note_id);
-			//剩余的redis缓存
-			redisDao.deleteCacheKey("0_"+note_id);
-			redisDao.deleteCacheKey("1_"+note_id);
-			redisDao.deleteCacheKey("2_"+note_id);
-			//删除图片文件
-			String direct_path = "/usr/java"; 
+			// 剩余的redis缓存
+			redisDao.deleteCacheKey("0_" + note_id);
+			redisDao.deleteCacheKey("1_" + note_id);
+			redisDao.deleteCacheKey("2_" + note_id);
+			// 删除图片文件
+			String direct_path = "/usr/java";
 			File file;
 			String image_url;
-			if(all_images != null || all_images.size() > 0){
-				for(Map<String, Object>map2 : all_images){
+			if (all_images != null || all_images.size() > 0) {
+				for (Map<String, Object> map2 : all_images) {
 					image_url = (String) map2.get(Const.IMAGE_URL);
-					file = new File(direct_path+image_url.substring(19, image_url.length()));
-					if(file.exists()){
+					file = new File(direct_path + image_url.substring(19, image_url.length()));
+					if (file.exists()) {
 						file.delete();
 					}
 				}
 			}
-				
-		}else {
-			map.put(Const.ERR, "none");
+
+		} else {
+			map.put(Const.ERR, "原贴不存在");
 		}
 		return new Gson().toJson(map);
 	}
 
+	@Override
+	public String topReload(Integer user_id, String bunch) {
+		Map<String, Object> map = new HashMap<>();
+		// 更新显示过的帖子的续一秒数量，同时加上新发布的帖子
+		String[] old_notes = bunch.split(",");
+		Integer last_one = Integer.valueOf(old_notes[old_notes.length - 1]);
+		List<Note> latest_notes_star = noteDao.findLatestNoteStar(user_id, last_one);
+		List<Note> latest_notes_me = noteDao.findLatestNoteMe(user_id, last_one);
+		List<Note> latest_notes_merge = MergeUtil.mergeByIdForNote(latest_notes_star, latest_notes_me);
+		List<Note> update_list = updateNoteDieForNote(latest_notes_merge, Const.FANS);
+		if (update_list.size() == 0) {
+			map.put(Const.ERR, "0");
+		} else {
+			// 添加标签表和图片表
+			List<List<Map<String, Object>>> image_list = new ArrayList<>();
+			List<List<Map<String, Object>>> tag_list = new ArrayList<>();
+			List<List<Map<String, Object>>> comment_list = new ArrayList<>();
+			List<Integer> isGood_list = new ArrayList<>();
+			Map<Integer, Object> relay_list_map = new HashMap<>();
+			for (Note note : update_list) {
+				Integer note_id = note.getNote_id();
+				image_list.add(noteDao.findAllImage(note_id));
+				tag_list.add(noteDao.findAllTag(note_id));
+				// 24号新增，转发帖获取转发链的内容
+				if (note.getIsRelay() != 0) {
+					// 是转发帖的话
+					dealWithRelay(relay_list_map, note);
+				}
+				// 3号新增,热评数组
+				comment_list.add(commentService.getThreeCommentForNote(user_id, note.getNote_id()));
+				// 添加是否点赞
+				if (noteDao.isHaveGood(user_id, note_id) != null) {
+					isGood_list.add(1);
+				} else {
+					isGood_list.add(0);
+				}
+			}
+			map.put(Const.RESULT, ConvertUtil.convertNote2ListMap(update_list, image_list, tag_list, comment_list,
+					relay_list_map, isGood_list));
+		}
+		// 更新续一秒数量
+		List<Integer> good_num_list = new ArrayList<>();
+		for (String note_id_str : old_notes) {
+			good_num_list.add(noteDao.getLatestGoodNum(Integer.valueOf(note_id_str)));
+		}
+		map.put(Const.GOOD_NUM_LIST, good_num_list);
+		return new Gson().toJson(map);
+	}
 }

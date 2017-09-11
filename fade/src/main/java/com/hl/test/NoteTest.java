@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,14 +80,23 @@ public class NoteTest {
 	
 	@Test
 	public void test4() throws Exception {
-		System.out.println(redisDao.deleteNote(56));
+		System.out.println(redisDao.deleteNote(71));
 	}
 	
 	@Test
 	public void test5() throws Exception {
-		for(int i = 34; i <= 52; i++){
-			System.out.println(redisDao.deleteNote(i));
-		}
+		System.out.println(noteDao.getLatestGoodNum(999));
+	}
+	
+	@Test
+	public void test6() throws Exception {
+		List<Integer>list = new LinkedList<>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+		list.remove(0);
+		System.out.println(list.get(0));
 	}
 	
 	

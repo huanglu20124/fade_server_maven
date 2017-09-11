@@ -49,7 +49,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	//增加新用户
 	@Override
 	public Integer addUser(final User user) {
-		final String sql = "insert into user values(null,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?)";
+		final String sql = "insert into user values(null,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		//返回主键
 		getJdbcTemplate().update(new PreparedStatementCreator() {
@@ -63,6 +63,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 				psm.setString(9, user.getWechat_id()); psm.setString(10, user.getWeibo_id());
 				psm.setString(11, user.getQq_id());    psm.setString(12, user.getAera());
 				psm.setString(13, user.getWallpapaer_url());
+				psm.setString(14, user.getSchool());
 				return psm;
 			}
 		},keyHolder);
@@ -205,9 +206,52 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 			user.setFans_num(resultSet.getInt(Const.FANS_NUM));
 			user.setAera(resultSet.getString(Const.AREA));
 			user.setWallpapaer_url(resultSet.getString(Const.WALLPAPER_URL));
+			user.setSchool(resultSet.getString(Const.SCHOOL));
 			return user;
 		}
 		
+	}
+
+	@Override
+	public int editWallpaperUrl(Integer user_id, String wallpaper_url) {
+		String sql = "update user set wallpaper_url = ? where user_id=?";
+		return getJdbcTemplate().update(sql,wallpaper_url,user_id);
+	}
+
+	@Override
+	public int editNickname(Integer user_id, String nickname) {
+		String sql = "update user set nickname = ? where user_id=?";
+		return getJdbcTemplate().update(sql,nickname,user_id);
+	}
+
+	@Override
+	public int editSummary(Integer user_id, String summary) {
+		String sql = "update user set summary = ? where user_id=?";
+		return getJdbcTemplate().update(sql,summary,user_id);
+	}
+
+	@Override
+	public int editSex(Integer user_id, String sex) {
+		String sql = "update user set sex = ? where user_id=?";
+		return getJdbcTemplate().update(sql,sex,user_id);
+	}
+
+	@Override
+	public int editArea(Integer user_id, String area) {
+		String sql = "update user set area = ? where user_id=?";
+		return getJdbcTemplate().update(sql,area,user_id);
+	}
+
+	@Override
+	public int editSchool(Integer user_id, String school) {
+		String sql = "update user set school = ? where user_id=?";
+		return getJdbcTemplate().update(sql,school,user_id);
+	}
+
+	@Override
+	public String getHeadImageUrl(Integer user_id) {
+		String sql = "select head_image_url from user where user_id=?";
+		return getJdbcTemplate().queryForObject(sql,String.class,user_id);
 	}
 
 }

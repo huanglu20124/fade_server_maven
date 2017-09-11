@@ -19,6 +19,7 @@ public class User implements Serializable{
 	private String head_image_url;
 	private String register_time;
 	private String summary;
+	private String school;
 
 	//第三方提供的id
 	private String wechat_id;
@@ -139,6 +140,13 @@ public class User implements Serializable{
 		this.wechat_id = wechat_id;
 	}
 	
+	
+	public String getSchool() {
+		return school;
+	}
+	public void setSchool(String school) {
+		this.school = school;
+	}
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

@@ -2,12 +2,17 @@ package com.hl.timer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimerTask;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletContext;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.hl.dao.NoteDao;
 import com.hl.dao.RedisDao;
@@ -21,11 +26,11 @@ public class GetGoodNumTask extends TimerTask {
 		this.servletContext = servletContext;
 	}
 
+	private RedisDao redisDao;
 	@Override
 	public void run() {
 		//要执行的任务
-		NoteDao noteDao = BasicFactory.getFactory().getInstance(NoteDao.class);
-		RedisDao redisDao = BasicFactory.getFactory().getInstance(RedisDao.class);
+		//RedisDao redisDao = BasicFactory.getFactory().getInstance(RedisDao.class);
 //		System.out.println("重新写入redis");
 //		Jedis jedis = JedisPoolUtils.getJedis();
 //		
@@ -35,20 +40,22 @@ public class GetGoodNumTask extends TimerTask {
 //			jedis.zadd(Const.HOT_NOTE, map);
 //		}
 		//8月2日添加,从redis中提取排序表，存到servlet中，每10分钟更新一次
-		//采用大小为3的数组，最多存三个排序表，即是用户最多能得到30分钟前的排序
+		//采用大小为3的数组，最多存三个排序表，即是用户最多能得到50分钟前的排序
 		//每次更新，数组第一个插入最新排序表，后面的排序表往后挪，最后一个排序表被抛弃,就是队列,先进先出
+		ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+		redisDao = (RedisDao) applicationContext.getBean("redisDao");
 		List<Map<String, Object>>hot_note_array = (List<Map<String, Object>>) servletContext.getAttribute(Const.HOT_NOTE_ARRAY);
 		if(hot_note_array == null){
-			System.out.println("11111");
-			hot_note_array = new ArrayList<>();
+			System.out.println("首次写入");
+			hot_note_array = new LinkedList<>();
 			addNewMap(hot_note_array, redisDao);
 		}
-		else if (hot_note_array.size() < 3) {
-			System.out.println("2222");
+		else if (hot_note_array.size() < 6) {
+			System.out.println("队列未满");
 			addNewMap(hot_note_array, redisDao);
 		}
-		else if (hot_note_array.size() == 3) {
-			System.out.println("3333");
+		else if (hot_note_array.size() == 6) {
+			System.out.println("队列已满");
 			hot_note_array.remove(0);
 			addNewMap(hot_note_array, redisDao);
 		}
@@ -69,9 +76,9 @@ public class GetGoodNumTask extends TimerTask {
 	public void addNewMap(List<Map<String, Object>>hot_note_array,RedisDao redisDao){
 			Map<String, Object>map = new HashMap<>();
 			map.put(Const.HOT_ID, getRandomString(5)); //5位数的随即字符串作为排序表标识
-			map.put(Const.HOT_NOTE, redisDao.getAllNote());
+			List<Object>all_note_redis = redisDao.getAllNote();
+			map.put(Const.HOT_NOTE, all_note_redis);
 			hot_note_array.add(map);
-		    System.out.println(hot_note_array);
 		    servletContext.setAttribute(Const.HOT_NOTE_ARRAY, hot_note_array);
 	}
 	

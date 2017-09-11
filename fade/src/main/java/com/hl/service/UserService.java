@@ -17,6 +17,12 @@ public interface UserService {
 	public String updateByWechatId(String wechat_id);
 	public String registerWechatId(String js_code,User user);
 	
-	//测试事务回滚用
-	public String test1();
+	//编辑用户信息部分
+	String editWallpaperUrl(Integer user_id, String wallpaper_url);
+	String editNickname(Integer user_id, String nickname);
+	String editSummary(Integer user_id, String summary);
+	String editSex(Integer user_id, String sex);
+	String editArea(Integer user_id, String area);
+	String editSchool(Integer user_id, String school);
+	
 }

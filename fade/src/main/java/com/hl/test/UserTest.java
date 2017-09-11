@@ -44,11 +44,6 @@ public class UserTest {
 	}
 	
 	@Test
-	public void test4() throws Exception {
-		service.test1();
-	}
-	
-	@Test
 	public void test5() throws Exception {
 		User user = new User();
 		user.setFade_name("adasd");
@@ -65,15 +60,4 @@ public class UserTest {
 		System.out.println(service.loginUser(user));
 	}
 	
-	@Test
-	public void test7() throws Exception {
-		//System.out.println(service.saveHeadImageUrl("666", 619));
-		//System.out.println(service.getHeadImageUrl("13763359943", null, null, null, null));
-		System.out.println(service.test1());
-	}
-	
-	@Test
-	public void test8() throws Exception {
-		System.out.println(service.registerQueryTel("13763359943"));
-	}
 }

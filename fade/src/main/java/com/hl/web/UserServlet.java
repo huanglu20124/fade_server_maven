@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.hl.domain.User;
 import com.hl.service.UserService;
@@ -43,7 +44,7 @@ public class UserServlet extends HttpServlet {
 		PrintWriter writer = response.getWriter();
 		String answer = "";
 		//UserService userService = BasicFactory.getFactory().getInstance(UserService.class);
-		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+		ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
 		UserService userService = (UserService) applicationContext.getBean("userService");
 		
 		try {
@@ -81,6 +82,37 @@ public class UserServlet extends HttpServlet {
 				BeanUtils.populate(user, request.getParameterMap());
 				answer = userService.getHeadImageUrl(user);
 			    break;
+			
+			case "07":
+				//修改昵称
+				answer = userService.editNickname(Integer.valueOf(request.getParameter(Const.USER_ID)),
+						request.getParameter(Const.NICKNAME));
+				break;
+			
+			case "08":
+				//修改用户签名
+				answer = userService.editSummary(Integer.valueOf(request.getParameter(Const.USER_ID)),
+						request.getParameter(Const.SUMMARY));
+				break;
+			
+		    case "09":
+		    	//修改用户性别
+				answer = userService.editSex(Integer.valueOf(request.getParameter(Const.USER_ID)),
+						request.getParameter(Const.SEX));
+		    	break;
+			
+		    case "10":
+		    	//修改用户地区
+		    	answer = userService.editArea(Integer.valueOf(request.getParameter(Const.USER_ID)),
+		    			request.getParameter(Const.AREA));
+		        break;
+		    case "11":
+		    	//修改用户学校
+		    	answer = userService.editSchool(Integer.valueOf(request.getParameter(Const.USER_ID)),
+		    			request.getParameter(Const.SCHOOL));
+		        break;
+		    
+		    
 			default:
 				break;
 		}

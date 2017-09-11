@@ -68,8 +68,12 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 	@Override
 	public Map<String, Object> findOriginComment(Integer to_comment_id) {
 		//找到原评论内容
-		String sql = "select user_id,nickname,comment_content from comment where comment_id=?";
-		return getJdbcTemplate().queryForMap(sql,to_comment_id);
+		try {
+			String sql = "select user_id,nickname,comment_content from comment where comment_id=?";
+			return getJdbcTemplate().queryForMap(sql,to_comment_id);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Cacheable(value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
@@ -120,6 +124,11 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		return getJdbcTemplate().query(sql, new CommentRowMapper(),note_id);
 	}
 
+	@Override
+	public int deleteComment(Integer comment_id){
+		String sql = "delete from comment where comment_id = ?";
+		return getJdbcTemplate().update(sql,comment_id);
+	}
 	
 	class CommentRowMapper implements RowMapper<Comment>{
 		@Override
@@ -137,5 +146,12 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 			return comment;
 		}
 		
+	}
+
+	@Override
+	public int updateCommentHead(String head_image_url,Integer user_id) {
+		//更新评论头像
+		String sql="update comment set head_image_url=? where user_id=?";
+		return getJdbcTemplate().update(sql,head_image_url,user_id);
 	}
 }

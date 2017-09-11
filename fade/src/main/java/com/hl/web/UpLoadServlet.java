@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.hl.service.NoteService;
 import com.hl.service.UserService;
@@ -87,42 +88,48 @@ public class UpLoadServlet extends HttpServlet {
 			//图片的尺寸
 			String image_size_list_str = null;
 			
+			//url路径的中间部分
+			String path_head = "/image/head/";
+			String path_note = "/image/note/";
+			String path_wallpaper = "/image/wallpaper";
+			
 			List<FileItem>list = fileUpload.parseRequest(request);
 			for(FileItem fileItem : list){
 				if(fileItem.isFormField()){
 					String name = fileItem.getFieldName();
 					String value = fileItem.getString("utf-8");
-					System.out.println("name: " + name + " value: " + value);
+					//System.out.println("name: " + name + " value: " + value);
 					if(name.equals("imageType")) imageType = value;
 					if(name.equals(Const.USER_ID)) user_id = Integer.valueOf(value);
 					if(name.equals(Const.NOTE_ID)) note_id = Integer.valueOf(value);
 					if(name.endsWith("image_size_list")) image_size_list_str = value;
-					System.out.println("收到文件类型");
 					
 				}else{
 					String imagePath = "";
-					String path2 = "";
 					String fileName_ = fileItem.getName();
-					System.out.println("fileItem.getName()=="+fileName_);
 					int i = fileName_.lastIndexOf("\\");
 					String fileName = fileName_.substring(i+1);
-					String imageName = "";
 					String uuid = UUID.randomUUID().toString(); //生成随机数
-					
+					String imageName = uuid.substring(30)+"_"+fileName;
 					
 					if(imageType.equals("head")){
 						//imagePath = request.getSession().getServletContext().getRealPath("image/head");//存储到工程里面
 						//imagePath = "E:/image/head";//本地存储到外部
 						imagePath = "/usr/java/image/head";//云端存储到外部
-						path2 = "/image/head/";
-						imageName = uuid.substring(30)+"_"+fileName;
-					}else{
+						System.out.println("head");
+						
+					}
+					else if(imageType.equals("note")){
 						//imagePath = request.getSession().getServletContext().getRealPath("image/note");
 						//imagePath = "E:/image/note"; //本地存储到外部
 						imagePath = "/usr/java/image/note";//云端存储到外部
-						path2 = "/image/note/";
-						imageName = uuid.substring(30)+"_"+fileName;
-						note_image_list.add(ip_yun +path2+imageName);
+						note_image_list.add(ip_yun +path_note+imageName);
+						System.out.println("note");
+					}
+					else if(imageType.equals("wallpapaer")){
+						//2017.9.3新增，添加修改壁纸
+						imagePath = "/usr/java/image/wallpaper";//云端存储到外部	
+						System.out.println("wallpapaer");
 					}
 					File file = new File(imagePath);
 				     if(!file.exists()){
@@ -137,25 +144,31 @@ public class UpLoadServlet extends HttpServlet {
 					IOUtil.close(inputStream, outputStream);
 					
 					//删除临时文件
-					fileItem.delete();
-					//UserService service = BasicFactory.getFactory().getInstance(UserService.class);
-					ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
-					UserService userService = (UserService) applicationContext.getBean("userService");
+					fileItem.delete();	
+					
 					//保存用户头像
 					if(imageType.equals("head")){
-						String str_response = userService.saveHeadImageUrl(ip_yun +path2 + imageName,user_id);
+						ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
+						UserService userService = (UserService) applicationContext.getBean("userService");
+						String str_response = userService.saveHeadImageUrl(ip_yun +path_head + imageName,user_id);
 						response.getWriter().write(str_response);
-					}				
+					}
+					else if(imageType.equals("wallpaper")){
+						ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
+						UserService userService = (UserService) applicationContext.getBean("userService");
+						String str_response = userService.editWallpaperUrl(user_id, ip_yun +path_head + imageName);
+						response.getWriter().write(str_response);
+					}
 				}
 			}
-			
+				
 			//保存帖子图片
 			if(imageType.equals("note")){
-				System.out.println(note_image_list);
+				//System.out.println(note_image_list);
 				//得到图片尺寸数组
 				String[]image_size_list = image_size_list_str.split(",");
 				//NoteService noteService = BasicFactory.getFactory().getInstance(NoteService.class);
-				ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+				ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
 				NoteService noteService= (NoteService) applicationContext.getBean("noteService");
 				String str_response = noteService.saveNoteImageUrl(note_image_list,image_size_list,note_id);
 				response.getWriter().write(str_response);

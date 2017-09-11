@@ -9,19 +9,27 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.hl.dao.NoteDao;
 import com.hl.dao.RedisDao;
+import com.hl.service.NoteService;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationContext.xml")
 public class NoteOperation {
 	@Resource(name = "redisDao")
 	private RedisDao redisDao;
+	@Resource(name = "noteDao")
+	private NoteDao noteDao;
+	@Resource(name = "noteService")
+	private NoteService noteService;
 	
-	public void updateRedisGoodNum(Integer note_id, Integer good_num){
-		redisDao.updateAddNoteRank(note_id, good_num);
+	public void updateRedisGoodNum(Integer note_id){
+		redisDao.updateAddNoteRank(note_id, noteDao.getLatestGoodNum(note_id));
 	}
 	
 	@Test
-	public void test1() throws Exception {
-		updateRedisGoodNum(32, 1000000);
+	public void forever() throws Exception {
+		//为帖子设置永久
+		updateRedisGoodNum(191);
 	}
+	
 }

@@ -243,11 +243,11 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 		//打开详情页，在列表一次获取20条续一秒
 		String sql = null;
 		if(start == 0){
-			sql = "select image_url,good_time,nickname,user_id,summary,good_time,good_id from note_good "
+			sql = "select head_image_url,good_time,nickname,user_id,summary,good_time,good_id from note_good "
 					+ "where note_id=?  order by good_id desc LIMIT 20";
 			return getJdbcTemplate().queryForList(sql,note_id);
 		}else{
-			   sql = "select image_url,good_time,nickname,user_id,summary,good_time,good_id from note_good "
+			   sql = "select head_image_url,good_time,nickname,user_id,summary,good_time,good_id from note_good "
 						+ "where note_id=? and good_id<? order by good_id desc LIMIT 20";
 			return getJdbcTemplate().queryForList(sql,note_id,start);
 		}		
@@ -327,6 +327,40 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 			return note;
 		}
 		
+	}
+
+	@Override
+	public List<Note> findLatestNoteStar(Integer user_id, Integer last_one) {
+		String sql = "select a.* from note a join relation b on a.user_id=b.user_star  "
+				+ "and b.user_fans = ? and a.isDie_fans=0 and a.note_id > ?";
+		return getJdbcTemplate().query(sql, new noteRowMapper(),user_id,last_one);
+	}
+
+	@Override
+	public List<Note> findLatestNoteMe(Integer user_id, Integer last_one) {
+		String sql = "select* from note where user_id=? and note_id>? and isDie_fans=0";
+		return getJdbcTemplate().query(sql, new noteRowMapper(),user_id,last_one);
+	}
+
+	@Override
+	public int updateNoteHead(String head_image_url,Integer user_id) {
+		//更新帖子头像
+		String sql = "update note set head_image_url = ? where user_id=?";
+		return getJdbcTemplate().update(sql,head_image_url,user_id);
+	}
+
+	@Override
+	public int updateNoteGoodHead(String head_image_url,Integer user_id) {
+		//更新帖子点赞表头像
+		String sql = "update note_good set head_image_url = ? where user_id=?";
+		return getJdbcTemplate().update(sql,head_image_url,user_id);
+	}
+
+	@Override
+	public List<Integer> findAllMyNoteId(Integer user_id) {
+		//找到个人全部帖子id
+		String sql = "select note_id from note where user_id=?";
+		return getJdbcTemplate().queryForList(sql,Integer.class,user_id);
 	}
 
 

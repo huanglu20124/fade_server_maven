@@ -26,9 +26,18 @@ public interface UserDao {
 	int saveImageUrlByOpenId(String imageUrl, String openId, String type);
 	
 	//通过user_id存储头像url
-	int saveImageUrlByUserId(String imageUrl, Integer user_id);
+	int saveImageUrlByUserId(String imageUrl, Integer user_id); //同时也是编辑用户头像要用到的
 	String getUserSummary(Integer user_id);
 	User getUserByUserId(Integer user_id);
 	public List<User> findStarUser(Integer user_id);
+	
+	//编辑用户信息部分
+	int editWallpaperUrl(Integer user_id, String wallpaper_url);
+	int editNickname(Integer user_id, String nickname);
+	int editSummary(Integer user_id, String summary);
+	int editSex(Integer user_id, String sex);
+	int editArea(Integer user_id, String area);
+	int editSchool(Integer user_id, String school);
+	String getHeadImageUrl(Integer user_id);
 
 }

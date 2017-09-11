@@ -11,12 +11,13 @@
 	<context:component-scan base-package="com.hl.dao"></context:component-scan>
 
 	<!-- 1.将连接池 -->
-	<bean name="dataSource1" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+	<bean name="dataSource1" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+	destroy-method="close">
 		<property name="jdbcUrl" value="jdbc:mysql://119.23.229.19:3306/fade?useUnicode=true&amp;characterEncoding=utf-8"></property>
 		<property name="driverClass" value="${jdbc.driverClass}"></property>
 		<property name="user" value="${jdbc.user}"></property>
 		<property name="password" value="${jdbc.password}"></property>
-		<property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>
+		<!--<property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>-->
 	</bean>
 
 

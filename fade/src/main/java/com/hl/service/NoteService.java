@@ -41,5 +41,6 @@ public interface NoteService {
 	
 	public String deleteNote(Integer note_id);
 	
+	public String topReload(Integer user_id,String bunch);
 
 }

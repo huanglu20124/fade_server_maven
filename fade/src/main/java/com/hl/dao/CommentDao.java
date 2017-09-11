@@ -23,5 +23,8 @@ public interface CommentDao {
 
 	List<Comment> getThreeComment(Integer note_id);
 
+	public int deleteComment(Integer comment_id);
+
+	public int updateCommentHead(String head_image_url,Integer user_id);
 
 }
