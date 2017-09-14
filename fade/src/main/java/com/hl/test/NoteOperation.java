@@ -29,7 +29,7 @@ public class NoteOperation {
 	@Test
 	public void forever() throws Exception {
 		//为帖子设置永久
-		updateRedisGoodNum(191);
+		updateRedisGoodNum(202);
 	}
 	
 }

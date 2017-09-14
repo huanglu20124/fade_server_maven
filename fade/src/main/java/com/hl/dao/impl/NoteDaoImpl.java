@@ -31,6 +31,7 @@ import com.hl.util.TimeUtil;
 public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
     
 	/**
+	 * 5.6废弃，真的没办法及时更新啊,其实他们不属于热数据，并不用缓存
 	 * noteDao缓存方法记录
 	 * 核心的缓存
 	 * (value="findNoteById",key="#type+'_'+#note_id")开头为0,1,2
@@ -167,14 +168,17 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 
 
 	@Override
-	public int[] saveImageBatch(Integer note_id, final List<String> note_image_list,final String[]image_size_list) {
-		String sql = "insert into note_image values(null,?,"+note_id+",?)";
+	public int[] saveImageBatch(Integer note_id, final List<String> note_image_list,final String[]image_size_list,final String []image_cooordinate_list,
+			final Integer image_cut_size) {
+		String sql = "insert into note_image values(null,?,"+note_id+",?,?,?)";
 		return getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {		
 			@Override
 			public void setValues(java.sql.PreparedStatement psm, int i) throws SQLException {
 				// TODO Auto-generated method stub
 				psm.setString(1, note_image_list.get(i));
 				psm.setDouble(2, Double.valueOf(image_size_list[i]));
+				psm.setString(3, image_cooordinate_list[i]);
+				psm.setInt(4, image_cut_size);
 			}
 			
 			@Override
@@ -189,7 +193,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 	@Override
 	public List<Map<String, Object>> findAllImage(Integer note_id) {
 		//找到所有图片
-		String sql = "select image_url, image_size from note_image where note_id=?";
+		String sql = "select image_url, image_size, image_coordinate, image_cut_size from note_image where note_id=?";
 		return (List<Map<String, Object>>) getJdbcTemplate().queryForList(sql,note_id);
 		
 	}
@@ -220,7 +224,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 	}
 
 
-	@Cacheable(value = "getTwentyRelay",key="'5_'+#note_id+'_'+#start" )
+//	@Cacheable(value = "getTwentyRelay",key="'5_'+#note_id+'_'+#start" )
 	@Override
 	public List<Map<String, Object>> getTwentyRelay(Integer note_id, Integer start) {
 		//打开详情页，在转发列表一次获取20条转发
@@ -237,7 +241,7 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 		}	
 	}
 
-	@Cacheable(value = "getTwentyGood",key="'6_'+#note_id+'_'+#start")
+	//@Cacheable(value = "getTwentyGood",key="'6_'+#note_id+'_'+#start")
 	@Override
 	public List<Map<String, Object>> getTwentyGood(Integer note_id, Integer start) {
 		//打开详情页，在列表一次获取20条续一秒
@@ -362,6 +366,35 @@ public class NoteDaoImpl extends JdbcDaoSupport implements NoteDao {
 		String sql = "select note_id from note where user_id=?";
 		return getJdbcTemplate().queryForList(sql,Integer.class,user_id);
 	}
+
+	@Override
+	public int delCommentNum(Integer note_id) {
+		//评论数量减一
+		String sql = "update note set comment_num = comment_num-1 where note_id=?";
+		return getJdbcTemplate().update(sql,note_id);
+	}
+
+	
+	@Override
+	public int  updateNoteNickname(String nickname, Integer user_id) {
+		String sql = "update note set nickname=? where user_id=?";
+		return getJdbcTemplate().update(sql,nickname,user_id);
+	}
+	
+
+	@Override
+	public int updateNoteGoodNickname(String nickname, Integer user_id) {
+		String sql = "update note_good set nickname=? where user_id=?";
+		return getJdbcTemplate().update(sql,nickname,user_id);
+	}
+
+	@Override
+	public int updateNoteGoodSummary(String summary, Integer user_id) {
+		String sql = "update note_good set summary=? where user_id=?";
+		return getJdbcTemplate().update(summary,user_id);
+	}
+	
+	
 
 
 

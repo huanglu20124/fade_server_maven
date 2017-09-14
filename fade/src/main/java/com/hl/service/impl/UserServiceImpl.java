@@ -144,12 +144,12 @@ public class UserServiceImpl implements UserService {
 					redisDao.deleteCacheKey("1_"+note_id);
 					redisDao.deleteCacheKey("2_"+note_id);
 				}
-				//3.2评论缓存，找到全部评论id
-//				List<Integer>my_comment_ids = commentDao.findAllMyCommentId(user_id);
-//				for(Integer comment_id : my_comment_ids){
-//					
-//				}
-				//3.3帖子点赞缓存
+				//3.2评论缓存，找到全部评论所属的note_id
+				List<Integer>comment_noteIds = commentDao.findAllMyCommentNoteId(user_id);
+				for(Integer comment_note_id : comment_noteIds){
+					redisDao.deleteCacheKey("c1_" + comment_note_id);
+					redisDao.deleteCacheKey("c4_" + comment_note_id);
+				}
 				
 			}
 			
@@ -262,36 +262,31 @@ public class UserServiceImpl implements UserService {
 		return jsonObject.toString();
 	}
 
-	private void putUserAllJson(JSONObject jsonObject, User user) {
-		try {
-			jsonObject.put(Const.NICKNAME, user.getNickname());
-			jsonObject.put(Const.HEAD_IMAGE_URL, user.getHead_image_url());
-			jsonObject.put(Const.FADE_NAME, user.getFade_name());
-			jsonObject.put(Const.TELEPHONE, user.getTelephone());
-			jsonObject.put(Const.SEX, user.getSex());
-			jsonObject.put(Const.USER_ID, user.getUser_id());
-			jsonObject.put(Const.SUMMARY, user.getSummary());
-			jsonObject.put(Const.WECHAT_ID, user.getWechat_id());
-			jsonObject.put(Const.WEIBO_ID, user.getWeibo_id());
-			jsonObject.put(Const.QQ_ID, user.getQq_id());
-
-			jsonObject.put(Const.CONCERN_NUM, user.getConcern_num());
-			jsonObject.put(Const.FANS_NUM, user.getFans_num());
-			jsonObject.put(Const.AREA, user.getAera());
-			jsonObject.put(Const.WALLPAPER_URL, user.getWallpapaer_url());
-			jsonObject.put(Const.REGISTER_TIME, user.getRegister_time());
-			jsonObject.put(Const.SCHOOL, user.getSchool());
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public String editNickname(Integer user_id, String nickname) {
 		Map<String, Object> map = new HashMap<>();
 		if (userDao.editNickname(user_id, nickname) == 0) {
 			map.put(Const.ERR, "用户不存在");
+		}else{
+			//更新帖子表、评论表、帖子点赞表
+			noteDao.updateNoteNickname(nickname, user_id);
+			noteDao.updateNoteGoodNickname(nickname,user_id);
+			commentDao.updateCommentNickname(nickname,user_id);
+			//删除缓存
+			//3.1帖子缓存，找到全部帖子的id
+			List<Integer>my_note_ids = noteDao.findAllMyNoteId(user_id);
+			for(Integer note_id : my_note_ids){
+				redisDao.deleteCacheKey("0_"+note_id);
+				redisDao.deleteCacheKey("1_"+note_id);
+				redisDao.deleteCacheKey("2_"+note_id);
+			}
+			//3.2评论缓存，找到全部评论所属的note_id
+			List<Integer>comment_noteIds = commentDao.findAllMyCommentNoteId(user_id);
+			for(Integer comment_note_id : comment_noteIds){
+				redisDao.deleteCacheKey("c1_" + comment_note_id);
+				redisDao.deleteCacheKey("c4_" + comment_note_id);
+			}
+			
 		}
 		return new Gson().toJson(map);
 	}
@@ -301,6 +296,9 @@ public class UserServiceImpl implements UserService {
 		Map<String, Object> map = new HashMap<>();
 		if (userDao.editSummary(user_id, summary) == 0) {
 			map.put(Const.ERR, "用户不存在");
+		}else{
+			//更新点赞表
+			noteDao.updateNoteGoodSummary(summary,user_id);
 		}
 		return new Gson().toJson(map);
 	}
@@ -341,6 +339,31 @@ public class UserServiceImpl implements UserService {
 			map.put(Const.WALLPAPER_URL, wallpaper_url);
 		}
 		return new Gson().toJson(map);
+	}
+	
+	private void putUserAllJson(JSONObject jsonObject, User user) {
+		try {
+			jsonObject.put(Const.NICKNAME, user.getNickname());
+			jsonObject.put(Const.HEAD_IMAGE_URL, user.getHead_image_url());
+			jsonObject.put(Const.FADE_NAME, user.getFade_name());
+			jsonObject.put(Const.TELEPHONE, user.getTelephone());
+			jsonObject.put(Const.SEX, user.getSex());
+			jsonObject.put(Const.USER_ID, user.getUser_id());
+			jsonObject.put(Const.SUMMARY, user.getSummary());
+			jsonObject.put(Const.WECHAT_ID, user.getWechat_id());
+			jsonObject.put(Const.WEIBO_ID, user.getWeibo_id());
+			jsonObject.put(Const.QQ_ID, user.getQq_id());
+
+			jsonObject.put(Const.CONCERN_NUM, user.getConcern_num());
+			jsonObject.put(Const.FANS_NUM, user.getFans_num());
+			jsonObject.put(Const.AREA, user.getAera());
+			jsonObject.put(Const.WALLPAPER_URL, user.getWallpapaer_url());
+			jsonObject.put(Const.REGISTER_TIME, user.getRegister_time());
+			jsonObject.put(Const.SCHOOL, user.getSchool());
+			jsonObject.put(Const.FADE_NUM, user.getFade_num());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

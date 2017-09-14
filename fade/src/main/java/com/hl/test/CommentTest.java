@@ -23,4 +23,6 @@ public class CommentTest {
 	public void test2() throws Exception {
 		commentDao.addCommentGood(999, 999, 999);
 	}
+	
+	
 }

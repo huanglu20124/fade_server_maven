@@ -49,7 +49,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	//增加新用户
 	@Override
 	public Integer addUser(final User user) {
-		final String sql = "insert into user values(null,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?,?)";
+		final String sql = "insert into user values(null,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?,?,0)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		//返回主键
 		getJdbcTemplate().update(new PreparedStatementCreator() {
@@ -184,34 +184,6 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 		return getJdbcTemplate().query(sql, new UserRowMapper(),user_id);			
 	}
 
-	class UserRowMapper implements RowMapper<User>{
-
-		@Override
-		public User mapRow(ResultSet resultSet, int arg1) throws SQLException {
-			User user = new User();
-			user.setUser_id(resultSet.getInt(Const.USER_ID));
-			user.setNickname(resultSet.getString(Const.NICKNAME));
-			user.setTelephone(resultSet.getString(Const.TELEPHONE));
-			user.setPassword(resultSet.getString(Const.PASSWORD));
-			user.setFade_name(resultSet.getString(Const.FADE_NAME));
-			user.setSex(resultSet.getString(Const.SEX));
-			//邮箱暂未设置
-			user.setHead_image_url(resultSet.getString(Const.HEAD_IMAGE_URL));
-			user.setRegister_time(resultSet.getString(Const.REGISTER_TIME));
-			user.setSummary(resultSet.getString(Const.SUMMARY));
-			user.setWechat_id(resultSet.getString(Const.WECHAT_ID));
-			user.setWeibo_id(resultSet.getString(Const.WEIBO_ID));
-			user.setQq_id(resultSet.getString(Const.QQ_ID));
-			user.setConcern_num(resultSet.getInt(Const.CONCERN_NUM));
-			user.setFans_num(resultSet.getInt(Const.FANS_NUM));
-			user.setAera(resultSet.getString(Const.AREA));
-			user.setWallpapaer_url(resultSet.getString(Const.WALLPAPER_URL));
-			user.setSchool(resultSet.getString(Const.SCHOOL));
-			return user;
-		}
-		
-	}
-
 	@Override
 	public int editWallpaperUrl(Integer user_id, String wallpaper_url) {
 		String sql = "update user set wallpaper_url = ? where user_id=?";
@@ -253,5 +225,33 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 		String sql = "select head_image_url from user where user_id=?";
 		return getJdbcTemplate().queryForObject(sql,String.class,user_id);
 	}
+	
+	class UserRowMapper implements RowMapper<User>{
 
+		@Override
+		public User mapRow(ResultSet resultSet, int arg1) throws SQLException {
+			User user = new User();
+			user.setUser_id(resultSet.getInt(Const.USER_ID));
+			user.setNickname(resultSet.getString(Const.NICKNAME));
+			user.setTelephone(resultSet.getString(Const.TELEPHONE));
+			user.setPassword(resultSet.getString(Const.PASSWORD));
+			user.setFade_name(resultSet.getString(Const.FADE_NAME));
+			user.setSex(resultSet.getString(Const.SEX));
+			//邮箱暂未设置
+			user.setHead_image_url(resultSet.getString(Const.HEAD_IMAGE_URL));
+			user.setRegister_time(resultSet.getString(Const.REGISTER_TIME));
+			user.setSummary(resultSet.getString(Const.SUMMARY));
+			user.setWechat_id(resultSet.getString(Const.WECHAT_ID));
+			user.setWeibo_id(resultSet.getString(Const.WEIBO_ID));
+			user.setQq_id(resultSet.getString(Const.QQ_ID));
+			user.setConcern_num(resultSet.getInt(Const.CONCERN_NUM));
+			user.setFans_num(resultSet.getInt(Const.FANS_NUM));
+			user.setAera(resultSet.getString(Const.AREA));
+			user.setWallpapaer_url(resultSet.getString(Const.WALLPAPER_URL));
+			user.setSchool(resultSet.getString(Const.SCHOOL));
+			user.setFade_num(resultSet.getInt(Const.FADE_NUM));
+			return user;
+		}
+		
+	}
 }

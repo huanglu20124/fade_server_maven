@@ -87,6 +87,9 @@ public class UpLoadServlet extends HttpServlet {
 			List<String>note_image_list = new ArrayList<>();
 			//图片的尺寸
 			String image_size_list_str = null;
+			//新增属性
+			String  image_coordinate_list = null;
+			Integer image_cut_size = null;
 			
 			//url路径的中间部分
 			String path_head = "/image/head/";
@@ -102,7 +105,10 @@ public class UpLoadServlet extends HttpServlet {
 					if(name.equals("imageType")) imageType = value;
 					if(name.equals(Const.USER_ID)) user_id = Integer.valueOf(value);
 					if(name.equals(Const.NOTE_ID)) note_id = Integer.valueOf(value);
-					if(name.endsWith("image_size_list")) image_size_list_str = value;
+					if(name.equals("image_size_list")) image_size_list_str = value;
+					if(name.equals("cut_size")) image_cut_size = Integer.valueOf(value);
+					if(name.equals("coordinate_list")) image_coordinate_list = value;
+					
 					
 				}else{
 					String imagePath = "";
@@ -170,7 +176,7 @@ public class UpLoadServlet extends HttpServlet {
 				//NoteService noteService = BasicFactory.getFactory().getInstance(NoteService.class);
 				ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
 				NoteService noteService= (NoteService) applicationContext.getBean("noteService");
-				String str_response = noteService.saveNoteImageUrl(note_image_list,image_size_list,note_id);
+				String str_response = noteService.saveNoteImageUrl(note_image_list,image_size_list,image_coordinate_list.split(","),image_cut_size,note_id);
 				response.getWriter().write(str_response);
 				response.getWriter().flush();
 			}	

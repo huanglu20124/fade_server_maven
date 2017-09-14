@@ -80,7 +80,7 @@ public class NoteTest {
 	
 	@Test
 	public void test4() throws Exception {
-		System.out.println(redisDao.deleteNote(71));
+		System.out.println(redisDao.deleteNote(70));
 	}
 	
 	@Test

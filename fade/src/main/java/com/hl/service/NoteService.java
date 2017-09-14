@@ -21,7 +21,8 @@ public interface NoteService {
 
 	String getSectionDiscoverRecommond(HttpServletRequest request, Integer user_id,Integer start,String hot_id);
 	
-	public String saveNoteImageUrl(List<String> note_image_list,String[]image_size_list, Integer note_id);
+	public String saveNoteImageUrl(List<String> note_image_list,String[]image_size_list, String []image_cooordinate_list,
+			Integer image_cut_size,Integer note_id);
 
 	String getLatestGoodNum(Integer note_id);
 

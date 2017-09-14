@@ -27,4 +27,8 @@ public interface CommentDao {
 
 	public int updateCommentHead(String head_image_url,Integer user_id);
 
+	List<Integer> findAllMyCommentNoteId(Integer user_id);
+
+	int updateCommentNickname(String nickname, Integer user_id);
+
 }

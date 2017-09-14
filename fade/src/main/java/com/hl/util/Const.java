@@ -32,6 +32,7 @@ public class Const {
 	public static final String COMMENT_NUM     = "comment_num";
 	public static final String RELAY_NUM       = "relay_num";
 	public static final String GOOD_NUM        = "good_num";
+	public static final String FADE_NUM        = "fade_num";
 	public static final String ISRELAY         = "isRelay";
 	public static final String POST_AREA	   = "post_area";
 	public static final String ISGOOD          = "isGood";
@@ -105,5 +106,18 @@ public class Const {
 	
 	//8月23号重组
 	public static final String ERR = "err";
+	
+	//9月11日加入，标签表
+	public static final String TAG_ID            = "tag_id";
+	public static final String TAG_NAME          = "tag_name";
+	public static final String TAG_IMAGE_URL     = "tag_image_url";
+	public static final String TAG_REGISTER_TIME = "tag_register_time";
+	public static final String TAG_SUMMARY       = "tag_summary";
+	public static final String TAG_GOOD_SUM       = "tag_good_sum";
+	public static final String TAG_CONCERN_SUM    = "tag_concern_sum";
+	
+	//9月14日加入，图片新属性
+	public static final String IMAGE_COORDINATE  = "image_cooordinate";
+	public static final String IMAGE_CUT_SIZE    = "image_cut_size";
 	
 }

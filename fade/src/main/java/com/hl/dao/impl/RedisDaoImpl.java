@@ -116,6 +116,7 @@ public class RedisDaoImpl implements RedisDao {
 		//再删除zset里面的东西	
 //		redisTemplate.opsForZSet().remove(value_sb.toString(), key);	
 	}
+	
 
 
 }

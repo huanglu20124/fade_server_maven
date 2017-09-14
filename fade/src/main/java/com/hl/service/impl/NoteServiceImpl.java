@@ -39,7 +39,7 @@ import com.hl.util.TimeUtil;
 import com.mchange.v2.async.StrandedTaskReporting;
 import com.mysql.jdbc.Field;
 
-@Service("noteService")
+@Service("noteService" )
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:applicationContext.xml")
 public class NoteServiceImpl implements NoteService {
@@ -460,7 +460,7 @@ public class NoteServiceImpl implements NoteService {
 		redisDao.deleteCacheKey("7_" + origin_id);
 		redisDao.deleteCacheKey("9_" + origin_id);
 		// 5.1删除转发列表头20条缓存
-		redisDao.deleteCacheKey("5_" + origin_id + "_0");
+		//redisDao.deleteCacheKey("5_" + origin_id + "_0");
 		return gson.toJson(map);
 	}
 
@@ -479,7 +479,7 @@ public class NoteServiceImpl implements NoteService {
 				// 2.将点赞者录入帖子点赞表
 				noteDao.addGoodUser(note_id, user);
 				// 2.1.删除点赞表头20条的缓存
-				redisDao.deleteCacheKey("6_" + note_id + "_0");
+				//redisDao.deleteCacheKey("6_" + note_id + "_0");
 				// 4. 删除被点赞帖的缓存，以及点赞数量缓存
 				redisDao.deleteCacheKey("0_" + note_id);
 				redisDao.deleteCacheKey("1_" + note_id);
@@ -622,7 +622,8 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public String saveNoteImageUrl(List<String> note_image_list, String[] image_size_list, Integer note_id) {
+	public String saveNoteImageUrl(List<String> note_image_list, String[] image_size_list, String []image_cooordinate_list,
+			Integer image_cut_size,Integer note_id) {
 		Gson gson = new Gson();
 		Map<String, Object> map = new HashMap<>();
 		// 更新帖子图片表
@@ -630,7 +631,7 @@ public class NoteServiceImpl implements NoteService {
 			if(note_image_list.size() == 0){
 				map.put(Const.ERR, "上传图片失败，请检查你的网络");
 			}else{
-				noteDao.saveImageBatch(note_id, note_image_list, image_size_list);
+				noteDao.saveImageBatch(note_id, note_image_list, image_size_list,image_cooordinate_list,image_cut_size);
 				List<String> url_list = new ArrayList<>();
 				for (int i = 0; i < note_image_list.size(); i++) {
 					url_list.add(note_image_list.get(i));

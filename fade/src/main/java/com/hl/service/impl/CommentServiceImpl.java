@@ -140,7 +140,7 @@ public class CommentServiceImpl implements CommentService {
 
 	
 	@Override
-	public String deleteComment(Integer note_id,Integer comment_id,Integer start) {
+	public String deleteComment(Integer note_id,Integer comment_id) {
 		Map<String, Object>map = new HashMap<>();
 		//删除评论
 		if(commentDao.deleteComment(comment_id) == 1){
@@ -148,11 +148,61 @@ public class CommentServiceImpl implements CommentService {
 			redisDao.deleteCacheKey("c1_"+note_id);
 			redisDao.deleteCacheKey("c2_"+comment_id);
 			redisDao.deleteCacheKey("c4_"+note_id);
-			redisDao.deleteCacheKey("c3_"+note_id+"_"+start);
+			//redisDao.deleteCacheKey("c3_"+note_id+"_"+start);
+			//原贴的评论数量减一
+			noteDao.delCommentNum(note_id);
 		}else{
 			map.put(Const.ERR, "删除失败，原评论不存在");
 		}
 		return null;
+	}
+
+	
+	@Override
+	public String getFirstComment(Integer user_id, Integer note_id) {
+		//打开详情页，得到10条热门评论 + 普通评论
+		Map<String, Object>map = new HashMap<>();
+		List<Comment>comment_hot_list = commentDao.findTenCommentByGood(note_id);
+		Boolean isZero1 = false;
+		Boolean isZero2 = false;
+		if(comment_hot_list.size() != 0){
+			Map<Integer, Object>origin_comment_map = new HashMap<>();
+			List<Integer>comment_isGood_list = new ArrayList<>();
+			for(Comment comment : comment_hot_list){
+				if(comment.getTo_comment_id() != 0){
+					//说明是评论的回复,要加上原来的评论
+					origin_comment_map.put(comment.getComment_id(), commentDao.findOriginComment(comment.getTo_comment_id()));
+				}
+				Integer comment_isGood = (commentDao.isHaveCommentGood(comment.getComment_id(),user_id)) == null ? 0 : 1;
+				comment_isGood_list.add(comment_isGood);
+			}
+			map.put("hot_comment", ConvertUtil.convertComment2ListMap(comment_hot_list,origin_comment_map,comment_isGood_list));
+		}else{
+			isZero1 = true;
+		}
+		
+		
+		List<Comment>comment_normal_list = commentDao.findTwentyCommentByTime(note_id,0);
+		if(comment_normal_list.size() != 0){
+			Map<Integer, Object>origin_comment_map = new HashMap<>();
+			List<Integer>comment_isGood_list = new ArrayList<>();
+			for(Comment comment : comment_normal_list){
+				if(comment.getTo_comment_id() != 0){
+					//说明是评论的回复,要加上原来的评论
+					origin_comment_map.put(comment.getComment_id(), commentDao.findOriginComment(comment.getTo_comment_id()));
+				}
+				Integer comment_isGood = (commentDao.isHaveCommentGood(comment.getComment_id(),user_id)) == null ? 0 : 1;
+				comment_isGood_list.add(comment_isGood);
+			}
+			map.put("normal_comment", ConvertUtil.convertComment2ListMap(comment_normal_list,origin_comment_map,comment_isGood_list));
+		}else {
+			isZero2 = true;
+		}
+		
+		if(isZero1 == true && isZero2 == true){
+			map.put(Const.ERR, 0);
+		}
+		return new Gson().toJson(map);
 	}	
 
 	

@@ -22,6 +22,7 @@ import com.hl.util.Const;
 public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 	/**
 	 * commentDao缓存方法记录
+	 * 缓存3暂时废弃，因为分页查询暂时无法及时更新
 	 * (value="findTenCommentByGood",key="'c1_'+#note_id", unless="#result == null")
 	 * (value="findOriginComment",key="'c2_'+#to_comment_id", unless="#result == null")
 	 * (value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
@@ -76,7 +77,7 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		}
 	}
 
-	@Cacheable(value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
+	//@Cacheable(value="findTwentyCommentByTime",key="'c3_'+#note_id+'_'+#start", unless="#result == null")
 	@Override
 	public List<Comment> findTwentyCommentByTime(Integer note_id, Integer start) {
 		//打开详情页时，一次获取20条评论列表，按照时间顺序
@@ -153,5 +154,18 @@ public class CommentDaoImpl extends JdbcDaoSupport implements CommentDao {
 		//更新评论头像
 		String sql="update comment set head_image_url=? where user_id=?";
 		return getJdbcTemplate().update(sql,head_image_url,user_id);
+	}
+
+	@Override
+	public List<Integer> findAllMyCommentNoteId(Integer user_id) {
+		//找到自己评论过的所有帖子，用于删除缓存
+		String sql = "select note_id from comment where user_id = ?";
+		return getJdbcTemplate().queryForList(sql,Integer.class,user_id);
+	}
+
+	@Override
+	public int updateCommentNickname(String nickname, Integer user_id) {
+		String sql = "update comment set nickname=? where user_id=?";
+		return getJdbcTemplate().update(sql,nickname,user_id);
 	}
 }

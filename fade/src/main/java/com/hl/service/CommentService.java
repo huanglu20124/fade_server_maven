@@ -16,5 +16,8 @@ public interface CommentService {
 	String addCommentGood(Integer comment_id, Integer user_id, Integer note_id);
 	
 	List<Map<String, Object>> getThreeCommentForNote(Integer user_id,Integer note_id);
-	public String deleteComment(Integer note_id,Integer comment_id,Integer start);
+	
+	public String deleteComment(Integer note_id,Integer comment_id);
+	
+	public String getFirstComment(Integer user_id, Integer note_id);
 }

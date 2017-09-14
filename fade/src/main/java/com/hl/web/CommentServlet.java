@@ -81,6 +81,14 @@ public class CommentServlet extends HttpServlet {
 			ans_str = commentService.addCommentGood(Integer.valueOf(request.getParameter(Const.COMMENT_ID)),
 					Integer.valueOf(request.getParameter(Const.USER_ID)) ,Integer.valueOf(request.getParameter(Const.NOTE_ID)));
 		    break;
+		    
+		case "04"://删除评论
+			ans_str = commentService.deleteComment(Integer.valueOf(request.getParameter(Const.NOTE_ID)), Integer.valueOf(request.getParameter(Const.COMMENT_ID)));
+			break;
+		
+		case "05"://打开详情页，得到10条热门评论 + 普通评论
+			ans_str = commentService.getFirstComment(Integer.valueOf(request.getParameter(Const.USER_ID)) ,Integer.valueOf(request.getParameter(Const.NOTE_ID)));
+			break;
 		
 		default:
 			break;

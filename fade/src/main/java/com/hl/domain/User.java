@@ -56,6 +56,17 @@ public class User implements Serializable{
 	private String aera;
 	private String wallpapaer_url;
 	
+	//fade数量
+	private Integer fade_num;
+	
+	
+	
+	public Integer getFade_num() {
+		return fade_num;
+	}
+	public void setFade_num(Integer fade_num) {
+		this.fade_num = fade_num;
+	}
 	public String getSex() {
 		return sex;
 	}

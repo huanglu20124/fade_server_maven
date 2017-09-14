@@ -26,7 +26,8 @@ public interface NoteDao {
 	public int addCommentNum(Integer note_id);
 	public int[] updateNoteDieBatch(List<Integer> delete_list, int type);
 	public int[] addNoteTagBatch(Integer note_id, String tag_list);
-	public int[] saveImageBatch(Integer note_id, List<String> note_image_list,String[]image_size_list);
+	public int[] saveImageBatch(Integer note_id, List<String> note_image_list,String[]image_size_list,String []image_cooordinate_list,
+			Integer image_cut_size);
 	public Map<String,Object> findNoteForAddSecond(Integer note_id);
 	public int deleteNote(Integer note_id);
 	public List<Note> findLatestNoteStar(Integer user_id, Integer last_one);
@@ -34,4 +35,8 @@ public interface NoteDao {
 	public int updateNoteHead(String head_image_url,Integer user_id);
 	public int updateNoteGoodHead(String head_image_url,Integer user_id);
 	public List<Integer> findAllMyNoteId(Integer user_id);
+	public int delCommentNum(Integer note_id);
+	public int updateNoteNickname(String nickname, Integer user_id);
+	public int updateNoteGoodNickname(String nickname, Integer user_id);
+	public int updateNoteGoodSummary(String summary, Integer user_id);
 }
